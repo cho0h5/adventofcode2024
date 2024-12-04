@@ -1,42 +1,23 @@
 use std::fs::read_to_string;
 
-fn is_increasing(numbers: &[i32], thresh: i32) -> bool {
-    fn is_valid(gap: i32) -> bool {
-        1 <= gap && gap <= 3
-    }
-
-    let mut count = 0;
-
+fn is_increasing(numbers: &Vec<i32>) -> bool {
     for i in 1..numbers.len() {
-        if !is_valid(numbers[i] - numbers[i - 1]) {
-            if i >= 2 && is_valid(numbers[i] - numbers[i - 2]) {
-                count += 1;
-            } else {
-                return false;
-            }
+        let gap = numbers[i] - numbers[i - 1];
+        if gap <= 0 || gap >= 4{
+            return false;
         }
     }
-    count <= thresh
+    return true;
 }
 
-fn is_decreasing(numbers: &[i32], thresh: i32) -> bool {
-    fn is_valid(gap: i32) -> bool {
-        -3 <= gap && gap <= -1
-    }
-
-    let mut count = 0;
-
+fn is_decreasing(numbers: &Vec<i32>) -> bool {
     for i in 1..numbers.len() {
-        if !is_valid(numbers[i] - numbers[i - 1]) {
-            if i >= 2 && is_valid(numbers[i] - numbers[i - 2]) {
-                count += 1;
-            } else {
-                return false;
-            }
+        let gap = numbers[i] - numbers[i - 1];
+        if gap >= 0 || gap <= -4 {
+            return false;
         }
     }
-
-    count <= thresh
+    return true;
 }
 
 fn main() {
@@ -48,10 +29,10 @@ fn main() {
             .map(|x| -> i32 { x.parse().unwrap() })
             .collect();
 
-        if is_increasing(&numbers, 1)
-            || is_decreasing(&numbers, 1)
-            || is_increasing(&numbers[1..], 0)
-            || is_decreasing(&numbers[1..], 0) {
+        if is_increasing(&numbers) {
+            count += 1;
+            println!("Safe");
+        } else if is_decreasing(&numbers) {
             count += 1;
             println!("Safe");
         } else {
@@ -60,4 +41,3 @@ fn main() {
     }
     println!("{}", count);
 }
-
