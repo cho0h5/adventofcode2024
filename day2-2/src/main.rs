@@ -1,6 +1,6 @@
 use std::fs::read_to_string;
 
-fn is_increasing(numbers: &Vec<i32>) -> bool {
+fn is_increasing(numbers: &[i32], thresh: i32) -> bool {
     fn is_valid(gap: i32) -> bool {
         1 <= gap && gap <= 3
     }
@@ -16,10 +16,10 @@ fn is_increasing(numbers: &Vec<i32>) -> bool {
             }
         }
     }
-    count <= 1
+    count <= thresh
 }
 
-fn is_decreasing(numbers: &Vec<i32>) -> bool {
+fn is_decreasing(numbers: &[i32], thresh: i32) -> bool {
     fn is_valid(gap: i32) -> bool {
         -3 <= gap && gap <= -1
     }
@@ -36,7 +36,7 @@ fn is_decreasing(numbers: &Vec<i32>) -> bool {
         }
     }
 
-    count <= 1
+    count <= thresh
 }
 
 fn main() {
@@ -48,10 +48,10 @@ fn main() {
             .map(|x| -> i32 { x.parse().unwrap() })
             .collect();
 
-        if is_increasing(&numbers) {
-            count += 1;
-            println!("Safe");
-        } else if is_decreasing(&numbers) {
+        if is_increasing(&numbers, 1)
+            || is_decreasing(&numbers, 1)
+            || is_increasing(&numbers[1..], 0)
+            || is_decreasing(&numbers[1..], 0) {
             count += 1;
             println!("Safe");
         } else {
