@@ -20,6 +20,18 @@ fn is_decreasing(numbers: &Vec<i32>) -> bool {
     return true;
 }
 
+fn bf(numbers: &Vec<i32>) -> Vec<Vec<i32>> {
+    let mut numberss = vec![];
+
+    for i in 0..numbers.len() {
+        let mut temp = numbers[0..i].to_vec();
+        temp.extend(&numbers[i + 1..]);
+        numberss.push(temp);
+    }
+
+    numberss
+}
+
 fn main() {
     let filename = "input";
 
@@ -29,14 +41,17 @@ fn main() {
             .map(|x| -> i32 { x.parse().unwrap() })
             .collect();
 
-        if is_increasing(&numbers) {
-            count += 1;
-            println!("Safe");
-        } else if is_decreasing(&numbers) {
-            count += 1;
-            println!("Safe");
-        } else {
-            println!("Unsafe");
+        let numberss = bf(&numbers);
+
+        for numbers in numberss {
+            if is_increasing(&numbers)
+                || is_decreasing(&numbers) {
+                count += 1;
+                println!("Safe");
+                break;
+            } else {
+                println!("Unsafe");
+            }
         }
     }
     println!("{}", count);
