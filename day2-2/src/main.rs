@@ -9,10 +9,14 @@ fn is_increasing(numbers: &Vec<i32>) -> bool {
 
     for i in 1..numbers.len() {
         if !is_valid(numbers[i] - numbers[i - 1]) {
-            return false;
+            if i >= 2 && is_valid(numbers[i] - numbers[i - 2]) {
+                count += 1;
+            } else {
+                return false;
+            }
         }
     }
-    return true;
+    count <= 1
 }
 
 fn is_decreasing(numbers: &Vec<i32>) -> bool {
@@ -24,10 +28,15 @@ fn is_decreasing(numbers: &Vec<i32>) -> bool {
 
     for i in 1..numbers.len() {
         if !is_valid(numbers[i] - numbers[i - 1]) {
-            return false;
+            if i >= 2 && is_valid(numbers[i] - numbers[i - 2]) {
+                count += 1;
+            } else {
+                return false;
+            }
         }
     }
-    return true;
+
+    count <= 1
 }
 
 fn main() {
