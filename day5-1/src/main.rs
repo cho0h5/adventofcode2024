@@ -1,6 +1,29 @@
 use std::env;
 use std::fs::read_to_string;
 
+fn solve_update(orders: &Vec<(i32, i32)>, update: &Vec<i32>) -> bool {
+    fn is_valid(orders: &Vec<(i32, i32)>, a: i32, b: i32) -> bool {
+        for order in orders {
+            if order.0 == b && order.1 == a {
+                return false;
+            }
+        }
+        true
+    }
+
+    let len = update.len();
+
+    for i in 0..len {
+        for j in (i + 1)..len {
+            if !is_valid(orders, update[i], update[j]) {
+                return false;
+            }
+        }
+    }
+
+    true
+}
+
 fn main() {
     let mut orders = vec![];
     let mut updates = vec![];
@@ -18,13 +41,24 @@ fn main() {
             if numbers.len() == 1 {
                 continue;
             }
-            let numbers: Vec<i32> = numbers.iter()
+            let numbers: Vec<i32> = numbers
+                .iter()
                 .map(|x| -> i32 { x.parse().unwrap() })
                 .collect();
             updates.push(numbers);
         }
     }
 
-    println!("{:?}", orders);
-    println!("{:?}", updates);
+    let mut sum = 0;
+    for update in updates.iter() {
+        if solve_update(&orders, update) {
+            let len = update.len();
+            let mid = update[len / 2];
+            println!("mid: {}", mid);
+            sum += mid;
+        } else {
+            println!("failed");
+        }
+    }
+    println!("answer: {}", sum);
 }
