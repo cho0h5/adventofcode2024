@@ -1,57 +1,58 @@
 use std::env;
 use std::fs::read_to_string;
+use std::collections::HashMap;
 
-fn input() -> Vec<String> {
-    let mut stones = vec![];
+fn input() -> HashMap<i64, i64> {
+    let mut stones = HashMap::new();
 
     let filename = env::args().nth(1).unwrap();
     let binding = read_to_string(filename).unwrap();
     let line = binding.lines().nth(0).unwrap();
     for number in line.split_whitespace() {
-        stones.push(number.to_string());
+        *stones.entry(number.parse::<i64>().unwrap()).or_insert(0) += 1;
     }
 
     stones
 }
 
-fn blink(stones: Vec<String>) -> Vec<String> {
-    let mut results = vec![];
+fn blink(stones: HashMap<i64, i64>) -> HashMap<i64, i64> {
+    let mut results = HashMap::new();
 
-    for stone in stones {
-        let number = stone.parse::<i64>().unwrap();
-        match stone.len() {
-            1 if number == 0 => {
-                results.push(1.to_string());
-            },
-            x if x % 2 == 0 => {
-                let num1 = stone[..x / 2]
-                    .to_owned()
-                    .parse::<i64>()
-                    .unwrap();
-                let num2 = stone[x / 2..]
-                    .to_owned()
-                    .parse::<i64>()
-                    .unwrap();
-                results.push(num1.to_string());
-                results.push(num2.to_string());
-            },
-            _ => {
-                results.push((number * 2024).to_string());
-            }
+    for (stone, count) in stones {
+        let stone_str = stone.to_string();
+        let stone_len = stone_str.len();
+        if stone == 0 {
+            *results.entry(1).or_insert(0) += count;
+        } else if stone_len % 2 == 0 {
+            let num1 = stone_str[..stone_len / 2].parse::<i64>().unwrap();
+            let num2 = stone_str[stone_len / 2..].parse::<i64>().unwrap();
+            *results.entry(num1).or_insert(0) += count;
+            *results.entry(num2).or_insert(0) += count;
+        } else {
+            *results.entry(stone * 2024).or_insert(0) += count;
         }
     }
 
     results
 }
 
+fn count(stones: &HashMap<i64, i64>) -> i64 {
+    let mut sum = 0;
+
+    for (_, count) in stones {
+        sum += count;
+    }
+
+    sum
+}
+
 fn main() {
     let mut stones = input();
-    println!("init: {:?}", stones);
+    println!("init: {:#?}", stones);
     println!("{}: {:?}", 0, stones.len());
 
     for i in 1..=75 {
         stones = blink(stones);
-        // println!("{}: {:?}", i, stones);
-        println!("{}: {:?}", i, stones.len());
+        println!("{}: {:?}", i, count(&stones));
     }
 }
