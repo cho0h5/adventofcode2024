@@ -104,6 +104,7 @@ fn get_minimal_token(claw_machine: &ClawMachine) -> Option<i32> {
             continue;
         }
         if px == claw_machine.target_x && py == claw_machine.target_y {
+            println!("(i, j): ({}, {})", count_a, count_b);
             return Some(count_a * 3 + count_b);
         }
 
@@ -125,7 +126,9 @@ fn main() {
 
     let mut count_tokens = 0;
     for cm in &claw_machines {
-        count_tokens += get_minimal_token(cm).unwrap_or_default();
+        let token = get_minimal_token(cm).unwrap_or_default();
+        println!("token: {}", token);
+        count_tokens += token;
     }
     println!("count_tokens: {}", count_tokens);
 }

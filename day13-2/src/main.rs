@@ -1,4 +1,3 @@
-use std::cmp::Ordering;
 use std::env;
 use std::fs::read_to_string;
 
@@ -61,30 +60,9 @@ fn parse_file() -> Vec<ClawMachine> {
     claw_machines
 }
 
-#[derive(Eq, PartialEq)]
-struct State {
-    count_a: usize,
-    count_b: usize,
-}
-
-impl Ord for State {
-    fn cmp(&self, other: &Self) -> Ordering {
-        let self_cost = self.count_a * 3 + self.count_b;
-        let other_cost = other.count_a * 3 + other.count_b;
-        self_cost.cmp(&other_cost).reverse()
-    }
-}
-
-impl PartialOrd for State {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        let self_cost = self.count_a * 3 + self.count_b;
-        let other_cost = other.count_a * 3 + other.count_b;
-        Some(self_cost.cmp(&other_cost).reverse())
-    }
-}
-
-fn get_minimal_token(claw_machine: &ClawMachine) -> Option<usize> {
+fn get_candidates(claw_machine: &ClawMachine) -> Vec<usize> {
     println!("{:?}", claw_machine);
+    let mut candidates = Vec::new();
     let mut state = 0;
     let mut start_i = 0;
     let mut gap_i = 0;
@@ -92,7 +70,6 @@ fn get_minimal_token(claw_machine: &ClawMachine) -> Option<usize> {
     for i in 0..claw_machine.target_x / claw_machine.button_a_x + 1 {
         let remain = claw_machine.target_x - i * claw_machine.button_a_x;
         if remain % claw_machine.button_b_x == 0 {
-            // println!("{}, {}", i, remain / claw_machine.button_b_x);
             if state == 0 {
                 start_i = i;
                 state = 1;
@@ -104,44 +81,67 @@ fn get_minimal_token(claw_machine: &ClawMachine) -> Option<usize> {
     }
 
     if state == 0 {
-        return None;
+        return candidates;
     }
 
     if gap_i == 0 {
-        let i = start_i;
-        let remain = claw_machine.target_x - i * claw_machine.button_a_x;
-        if remain % claw_machine.button_b_x == 0 {
-            let j = remain / claw_machine.button_b_x;
-            let y = i * claw_machine.button_a_y + j * claw_machine.button_b_y;
-            if y == claw_machine.target_y {
-                println!("{}, {}", i, j);
-                let cost = 3 * i + j;
-                return Some(cost);
-            }
-        }
-        return None;
+        candidates.push(start_i);
+        return candidates;
     }
 
-    let mut min = usize::MAX;
     for i in (start_i..=claw_machine.target_x / claw_machine.button_a_x)
         .step_by(gap_i)
     {
+        candidates.push(i);
+    }
+    candidates
+}
+
+fn get_minimum_token(
+    claw_machine: &ClawMachine,
+    candidates: &[usize],
+) -> Option<usize> {
+    let estimate_y = |index: usize| -> usize {
+        let i = candidates[index];
         let remain = claw_machine.target_x - i * claw_machine.button_a_x;
-        if remain % claw_machine.button_b_x == 0 {
-            let j = remain / claw_machine.button_b_x;
-            let y = i * claw_machine.button_a_y + j * claw_machine.button_b_y;
-            if y == claw_machine.target_y {
-                println!("{}, {}", i, j);
-                let cost = 3 * i + j;
-                min = std::cmp::min(min, cost);
-            }
-        }
+        let j = remain / claw_machine.button_b_x;
+        let y = i * claw_machine.button_a_y + j * claw_machine.button_b_y;
+        y
+    };
+    if candidates.is_empty() {
+        return None;
     }
 
-    if min == usize::MAX {
-        None
+    let mid = candidates.len() / 2;
+    let i = candidates[mid];
+
+    let remain = claw_machine.target_x - i * claw_machine.button_a_x;
+    let j = remain / claw_machine.button_b_x;
+    let y = i * claw_machine.button_a_y + j * claw_machine.button_b_y;
+    let cost = if y == claw_machine.target_y {
+        Some(i * 3 + j)
     } else {
-        Some(min)
+        None
+    };
+    // println!("(i, j, cost): ({}, {}, {:?})", i, j, cost);
+    if candidates.len() == 1 {
+        return cost;
+    }
+
+    let gap = estimate_y(1) as isize - estimate_y(0) as isize;
+
+    if gap > 0 {
+        if y > claw_machine.target_y {
+            get_minimum_token(claw_machine, &candidates[..mid]).or(cost)
+        } else {
+            get_minimum_token(claw_machine, &candidates[mid + 1..]).or(cost)
+        }
+    } else {
+        if y > claw_machine.target_y {
+            get_minimum_token(claw_machine, &candidates[mid + 1..]).or(cost)
+        } else {
+            get_minimum_token(claw_machine, &candidates[..mid]).or(cost)
+        }
     }
 }
 
@@ -150,7 +150,11 @@ fn main() {
 
     let mut count_tokens = 0;
     for cm in &claw_machines {
-        count_tokens += get_minimal_token(cm).unwrap_or_default();
+        let candidates = get_candidates(cm);
+        println!("candidates: {:?}", candidates);
+        let token = get_minimum_token(cm, &candidates).unwrap_or_default();
+        println!("token: {}", token);
+        count_tokens += token;
     }
     println!("count_tokens: {}", count_tokens);
 }
