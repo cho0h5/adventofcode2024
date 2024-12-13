@@ -1,17 +1,15 @@
 use std::cmp::Ordering;
-use std::collections::BinaryHeap;
-use std::collections::HashMap;
 use std::env;
 use std::fs::read_to_string;
 
 #[derive(Debug, Clone, Copy)]
 struct ClawMachine {
-    button_a_x: i64,
-    button_a_y: i64,
-    button_b_x: i64,
-    button_b_y: i64,
-    target_x: i64,
-    target_y: i64,
+    button_a_x: usize,
+    button_a_y: usize,
+    button_b_x: usize,
+    button_b_y: usize,
+    target_x: usize,
+    target_y: usize,
 }
 
 fn parse_file() -> Vec<ClawMachine> {
@@ -49,12 +47,12 @@ fn parse_file() -> Vec<ClawMachine> {
             if let Some((part_x, part_y)) =
                 line.strip_prefix("Prize: X=").unwrap().split_once(", Y=")
             {
-                claw_machine.target_x = part_x.parse::<i64>().unwrap();
-                claw_machine.target_y = part_y.parse::<i64>().unwrap();
-                // claw_machine.target_x =
-                //     part_x.parse::<i64>().unwrap() + 10_000_000_000_000;
-                // claw_machine.target_y =
-                //     part_y.parse::<i64>().unwrap() + 10_000_000_000_000;
+                // claw_machine.target_x = part_x.parse::<usize>().unwrap();
+                // claw_machine.target_y = part_y.parse::<usize>().unwrap();
+                claw_machine.target_x =
+                    part_x.parse::<usize>().unwrap() + 10000000000000;
+                claw_machine.target_y =
+                    part_y.parse::<usize>().unwrap() + 10000000000000;
                 claw_machines.push(claw_machine);
             }
         }
@@ -65,8 +63,8 @@ fn parse_file() -> Vec<ClawMachine> {
 
 #[derive(Eq, PartialEq)]
 struct State {
-    count_a: i64,
-    count_b: i64,
+    count_a: usize,
+    count_b: usize,
 }
 
 impl Ord for State {
@@ -85,43 +83,66 @@ impl PartialOrd for State {
     }
 }
 
-fn get_minimal_token(claw_machine: &ClawMachine) -> Option<i64> {
+fn get_minimal_token(claw_machine: &ClawMachine) -> Option<usize> {
     println!("{:?}", claw_machine);
-    let mut heap = BinaryHeap::new();
-    let mut dp = HashMap::new();
-    heap.push(State {
-        count_a: 0,
-        count_b: 0,
-    });
+    let mut state = 0;
+    let mut start_i = 0;
+    let mut gap_i = 0;
 
-    while let Some(State { count_a, count_b }) = heap.pop() {
-        if let Some(_) = dp.get(&(count_a, count_b)) {
-            continue;
+    for i in 0..claw_machine.target_x / claw_machine.button_a_x + 1 {
+        let remain = claw_machine.target_x - i * claw_machine.button_a_x;
+        if remain % claw_machine.button_b_x == 0 {
+            // println!("{}, {}", i, remain / claw_machine.button_b_x);
+            if state == 0 {
+                start_i = i;
+                state = 1;
+            } else if state == 1 {
+                gap_i = i - start_i;
+                break;
+            }
         }
-        dp.insert((count_a, count_b), true);
-
-        let px = count_a * claw_machine.button_a_x
-            + count_b * claw_machine.button_b_x;
-        let py = count_a * claw_machine.button_a_y
-            + count_b * claw_machine.button_b_y;
-        if px > claw_machine.target_x || py > claw_machine.target_y {
-            continue;
-        }
-        if px == claw_machine.target_x && py == claw_machine.target_y {
-            return Some(count_a * 3 + count_b);
-        }
-
-        heap.push(State {
-            count_a: count_a + 1,
-            count_b: count_b,
-        });
-        heap.push(State {
-            count_a: count_a,
-            count_b: count_b + 1,
-        });
     }
 
-    None
+    if state == 0 {
+        return None;
+    }
+
+    if gap_i == 0 {
+        let i = start_i;
+        let remain = claw_machine.target_x - i * claw_machine.button_a_x;
+        if remain % claw_machine.button_b_x == 0 {
+            let j = remain / claw_machine.button_b_x;
+            let y = i * claw_machine.button_a_y + j * claw_machine.button_b_y;
+            if y == claw_machine.target_y {
+                println!("{}, {}", i, j);
+                let cost = 3 * i + j;
+                return Some(cost);
+            }
+        }
+        return None;
+    }
+
+    let mut min = usize::MAX;
+    for i in (start_i..=claw_machine.target_x / claw_machine.button_a_x)
+        .step_by(gap_i)
+    {
+        let remain = claw_machine.target_x - i * claw_machine.button_a_x;
+        if remain % claw_machine.button_b_x == 0 {
+            let j = remain / claw_machine.button_b_x;
+            let y = i * claw_machine.button_a_y + j * claw_machine.button_b_y;
+            if y == claw_machine.target_y {
+                println!("{}, {}", i, j);
+                let cost = 3 * i + j;
+                min = std::cmp::min(min, cost);
+            }
+        }
+    }
+
+    if min == usize::MAX {
+        None
+    } else {
+        Some(min)
+    }
 }
 
 fn main() {
