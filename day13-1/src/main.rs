@@ -91,7 +91,7 @@ fn get_minimal_token(claw_machine: &ClawMachine) -> Option<i32> {
     });
 
     while let Some(State { count_a, count_b }) = heap.pop() {
-        if let Some(_) = dp.get(&(count_a, count_b)) {
+        if dp.contains_key(&(count_a, count_b)) {
             continue;
         }
         dp.insert((count_a, count_b), true);
@@ -110,10 +110,10 @@ fn get_minimal_token(claw_machine: &ClawMachine) -> Option<i32> {
 
         heap.push(State {
             count_a: count_a + 1,
-            count_b: count_b,
+            count_b,
         });
         heap.push(State {
-            count_a: count_a,
+            count_a,
             count_b: count_b + 1,
         });
     }
