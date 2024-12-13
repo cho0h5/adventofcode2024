@@ -1,13 +1,13 @@
+use std::collections::HashMap;
 use std::env;
 use std::fs::read_to_string;
-use std::collections::HashMap;
 
 fn input() -> HashMap<i64, i64> {
     let mut stones = HashMap::new();
 
     let filename = env::args().nth(1).unwrap();
     let binding = read_to_string(filename).unwrap();
-    let line = binding.lines().nth(0).unwrap();
+    let line = binding.lines().next().unwrap();
     for number in line.split_whitespace() {
         *stones.entry(number.parse::<i64>().unwrap()).or_insert(0) += 1;
     }
@@ -39,7 +39,7 @@ fn blink(stones: HashMap<i64, i64>) -> HashMap<i64, i64> {
 fn count(stones: &HashMap<i64, i64>) -> i64 {
     let mut sum = 0;
 
-    for (_, count) in stones {
+    for count in stones.values() {
         sum += count;
     }
 
