@@ -58,11 +58,11 @@ fn find_antinodes(antimap: &mut AntiMap, antennas: &[(isize, isize)]) {
             let mut ny = antennas[j].1;
 
             loop {
-                nx += dx;
-                ny += dy;
                 if !set_antinode(nx, ny) {
                     break;
                 }
+                nx += dx;
+                ny += dy;
             }
         }
     }
