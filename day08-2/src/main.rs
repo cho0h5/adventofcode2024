@@ -33,13 +33,16 @@ fn print_map(map: &Map) {
 }
 
 fn find_antinodes(antimap: &mut AntiMap, antennas: &[(isize, isize)]) {
-    let mut set_antinode = |x: isize, y: isize| {
+    let mut set_antinode = |x: isize, y: isize| -> bool {
         if x >= 0
             && x < antimap.len() as isize
             && y >= 0
             && y < antimap[0].len() as isize
         {
             antimap[x as usize][y as usize] = true;
+            true
+        } else {
+            false
         }
     };
 
@@ -51,16 +54,30 @@ fn find_antinodes(antimap: &mut AntiMap, antennas: &[(isize, isize)]) {
 
             let dx = antennas[j].0 - antennas[i].0;
             let dy = antennas[j].1 - antennas[i].1;
-            let nx = antennas[j].0 + dx;
-            let ny = antennas[j].1 + dy;
-            set_antinode(nx, ny);
+            let mut nx = antennas[j].0;
+            let mut ny = antennas[j].1;
+
+            loop {
+                nx += dx;
+                ny += dy;
+                if !set_antinode(nx, ny) {
+                    break;
+                }
+            }
         }
     }
 }
 
 fn print_antimap(antimap: &AntiMap) {
     for line in antimap {
-        println!("{:?}", line);
+        for b in line {
+            if *b {
+                print!("#");
+            } else {
+                print!(".");
+            }
+        }
+        println!();
     }
 }
 
