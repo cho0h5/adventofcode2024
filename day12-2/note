@@ -1,17 +1,13 @@
-+---+
-|   | # First, the upper block must be other plant.
-| A |
-|AAA|
-+---+
++----+
+|AAAA|
+|BBCD|
+|BBCC|
+|EEEC|
++----+
 
-+---+
-|   | # Second, if there was same plane on left or right block,
-| AA| # then the count it must not be increased.
-|AAA|
-+---+
-
-+---+
-|  A| # Third, if there is same plane on upper left or right block,
-| A | # then the count must be increased.
-|AAA|
-+---+
++----+
+|AAAA|
+|BBCD|
+|BBCC|
+|EEEC|
++----+
