@@ -6,7 +6,7 @@ fn input() -> Vec<i64> {
 
     let filename = env::args().nth(1).unwrap();
     let binding = read_to_string(filename).unwrap();
-    let line = binding.lines().nth(0).unwrap();
+    let line = binding.lines().next().unwrap();
     for (i, c) in line.chars().enumerate() {
         let num = c as i64 - '0' as i64;
         for _ in 0..num {
@@ -21,7 +21,7 @@ fn input() -> Vec<i64> {
     disk
 }
 
-fn compacting(disk: &mut Vec<i64>) {
+fn compacting(disk: &mut [i64]) {
     let mut tail = disk.len() - 1;
 
     for i in 0..disk.len() {
@@ -42,7 +42,7 @@ fn compacting(disk: &mut Vec<i64>) {
     }
 }
 
-fn checksum(disk: &Vec<i64>) -> i64 {
+fn checksum(disk: &[i64]) -> i64 {
     let mut sum = 0;
 
     for (i, id) in disk.iter().enumerate() {
@@ -66,4 +66,3 @@ fn main() {
     let sum = checksum(&disk);
     println!("checksum: {:?}", sum);
 }
-
