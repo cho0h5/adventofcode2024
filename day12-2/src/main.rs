@@ -21,6 +21,7 @@ fn print_map(map: &Vec<Vec<char>>) {
     println!();
 }
 
+#[allow(dead_code)]
 fn print_border(map: &Vec<Vec<[bool; 4]>>) {
     println!("border:");
     for line in map {
@@ -30,8 +31,8 @@ fn print_border(map: &Vec<Vec<[bool; 4]>>) {
 }
 
 fn bfs(
-    map: &Vec<Vec<char>>,
-    vst: &mut Vec<Vec<bool>>,
+    map: &[Vec<char>],
+    vst: &mut [Vec<bool>],
     x: isize,
     y: isize,
 ) -> (isize, Vec<Vec<[bool; 4]>>) {
@@ -88,9 +89,9 @@ fn bfs(
 }
 
 fn perimeter_each(
-    border: &Vec<Vec<[bool; 4]>>,
+    border: &[Vec<[bool; 4]>],
     index: usize,
-    vst: &mut Vec<Vec<bool>>,
+    vst: &mut [Vec<bool>],
     i: isize,
     j: isize,
 ) {
@@ -113,7 +114,7 @@ fn perimeter_each(
                 && ny >= 0
                 && ny < border[0].len() as isize
                 && !vst[nx as usize][ny as usize]
-                && border[nx as usize][ny as usize][index] == true
+                && border[nx as usize][ny as usize][index]
             {
                 deque.push_back((nx, ny));
             }
@@ -121,14 +122,14 @@ fn perimeter_each(
     }
 }
 
-fn count_perimeter(border: &Vec<Vec<[bool; 4]>>, index: usize) -> isize {
+fn count_perimeter(border: &[Vec<[bool; 4]>], index: usize) -> isize {
     let mut vst: Vec<Vec<bool>> =
         border.iter().map(|row| vec![false; row.len()]).collect();
     let mut count = 0;
 
     for i in 0..border.len() {
         for j in 0..border[0].len() {
-            if border[i][j][index] == false {
+            if !border[i][j][index] {
                 continue;
             }
             if vst[i][j] {
@@ -142,7 +143,7 @@ fn count_perimeter(border: &Vec<Vec<[bool; 4]>>, index: usize) -> isize {
     count
 }
 
-fn bfs_border(border: &Vec<Vec<[bool; 4]>>) -> isize {
+fn bfs_border(border: &[Vec<[bool; 4]>]) -> isize {
     let mut perimeter = 0;
 
     perimeter += count_perimeter(border, 0);
