@@ -69,9 +69,9 @@ fn create_map(robots: &[Robot]) -> Vec<Vec<usize>> {
 
 fn print_map(map: &[Vec<usize>]) {
     for j in 0..HEIGHT {
-        for i in 0..WIDTH {
-            if map[i][j] != 0 {
-                print!("{} ", map[i][j]);
+        for line in map {
+            if line[j] != 0 {
+                print!("{} ", line[j]);
             } else {
                 print!("  ");
             }
