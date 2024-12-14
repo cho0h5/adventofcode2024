@@ -1,3 +1,4 @@
+use std::collections::VecDeque;
 use std::env;
 use std::fs::read_to_string;
 
@@ -5,7 +6,6 @@ use std::fs::read_to_string;
 // const HEIGHT: usize = 7;
 const WIDTH: usize = 101;
 const HEIGHT: usize = 103;
-const DURATION: usize = 1000;
 
 #[derive(Debug, Clone, Copy)]
 struct Robot {
@@ -56,7 +56,7 @@ fn simulation(robots: &mut [Robot]) {
     }
 }
 
-fn print_map(robots: &[Robot]) {
+fn create_map(robots: &[Robot]) -> Vec<Vec<usize>> {
     let mut map = vec![vec![0; HEIGHT]; WIDTH];
 
     for robot in robots {
@@ -64,7 +64,10 @@ fn print_map(robots: &[Robot]) {
         let py = robot.pos_y as usize;
         map[px][py] += 1;
     }
+    map
+}
 
+fn print_map(map: &[Vec<usize>]) {
     for j in 0..HEIGHT {
         for i in 0..WIDTH {
             if map[i][j] != 0 {
@@ -77,13 +80,73 @@ fn print_map(robots: &[Robot]) {
     }
 }
 
+fn bfs(
+    map: &[Vec<usize>],
+    vst: &mut [Vec<bool>],
+    sx: usize,
+    sy: usize,
+) -> usize {
+    let mut deque = VecDeque::new();
+    deque.push_back((sx, sy));
+
+    let mut area = 0;
+    while let Some((cx, cy)) = deque.pop_front() {
+        let dx = [1, 1, 1, 0, -1, -1, -1, 0];
+        let dy = [-1, 0, 1, 1, 1, 0, -1, -1];
+
+        for k in 0..8 {
+            let nx = cx as i32 + dx[k];
+            let ny = cy as i32 + dy[k];
+
+            if nx < 0 || nx >= WIDTH as i32 || ny < 0 || ny >= HEIGHT as i32 {
+                continue;
+            }
+            let nx = nx as usize;
+            let ny = ny as usize;
+
+            if map[nx][ny] == 0 || vst[nx][ny] {
+                continue;
+            }
+
+            vst[nx][ny] = true;
+            area += 1;
+            deque.push_back((nx, ny));
+        }
+    }
+    area
+}
+
+fn is_easter_egg(map: &[Vec<usize>]) -> usize {
+    let mut vst = vec![vec![false; HEIGHT]; WIDTH];
+
+    let mut maximum = 0;
+    for i in 0..WIDTH {
+        for j in 0..HEIGHT {
+            if map[i][j] == 0 || vst[i][j] {
+                continue;
+            }
+
+            let res = bfs(map, &mut vst, i, j);
+            maximum = std::cmp::max(maximum, res);
+        }
+    }
+    maximum
+}
+
+const DURATION: usize = 1000000;
+
 fn main() {
     let mut robots = parse_file();
 
     for i in 0..DURATION {
-        println!("i: {}", i);
         simulation(&mut robots);
-        print_map(&robots);
-        println!("----------------------------------------");
+        let map = create_map(&robots);
+        let easter_egg_score = is_easter_egg(&map);
+        if easter_egg_score >= 100 {
+            println!("i: {}", i);
+            println!("easter egg score: {}", easter_egg_score);
+            print_map(&map);
+            println!("----------------------------------------");
+        }
     }
 }
