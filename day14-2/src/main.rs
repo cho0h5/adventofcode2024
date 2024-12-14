@@ -5,7 +5,7 @@ use std::fs::read_to_string;
 // const HEIGHT: usize = 7;
 const WIDTH: usize = 101;
 const HEIGHT: usize = 103;
-const DURATION: usize = 100;
+const DURATION: usize = 1000;
 
 #[derive(Debug, Clone, Copy)]
 struct Robot {
@@ -56,10 +56,34 @@ fn simulation(robots: &mut [Robot]) {
     }
 }
 
+fn print_map(robots: &[Robot]) {
+    let mut map = vec![vec![0; HEIGHT]; WIDTH];
+
+    for robot in robots {
+        let px = robot.pos_x as usize;
+        let py = robot.pos_y as usize;
+        map[px][py] += 1;
+    }
+
+    for j in 0..HEIGHT {
+        for i in 0..WIDTH {
+            if map[i][j] != 0 {
+                print!("{} ", map[i][j]);
+            } else {
+                print!("  ");
+            }
+        }
+        println!();
+    }
+}
+
 fn main() {
     let mut robots = parse_file();
 
-    for _ in 0..DURATION {
+    for i in 0..DURATION {
+        println!("i: {}", i);
         simulation(&mut robots);
+        print_map(&robots);
+        println!("----------------------------------------");
     }
 }
