@@ -143,10 +143,11 @@ fn main() {
         let map = create_map(&robots);
         let easter_egg_score = is_easter_egg(&map);
         if easter_egg_score >= 100 {
-            println!("i: {}", i);
-            println!("easter egg score: {}", easter_egg_score);
             print_map(&map);
+            println!("easter egg score: {}", easter_egg_score);
+            println!("elapsed second: {}", i + 1);
             println!("----------------------------------------");
+            break;
         }
     }
 }
