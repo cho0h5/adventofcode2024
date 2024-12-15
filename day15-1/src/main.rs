@@ -1,4 +1,3 @@
-use std::collections::VecDeque;
 use std::env;
 use std::fs::read_to_string;
 
@@ -44,11 +43,11 @@ fn print_map(map: &[Vec<char>]) {
 
 // `#`을 만나기 전까지 `.`이 있나 확인.
 fn run(map: &mut [Vec<char>], pos: &mut (i32, i32), inst: char) {
-    let mut width = map.len();
-    let mut height = map[0].len();
+    let width = map.len();
+    let height = map[0].len();
     match inst {
         '>' => {
-            let mut i = pos.0;
+            let i = pos.0;
             let mut last_j = -1;
             for j in pos.1 + 1..height as i32 {
                 if map[i as usize][j as usize] == '#' {
@@ -67,7 +66,7 @@ fn run(map: &mut [Vec<char>], pos: &mut (i32, i32), inst: char) {
             pos.1 += 1;
         },
         '<' => {
-            let mut i = pos.0;
+            let i = pos.0;
             let mut last_j = -1;
             for j in (0..=pos.1 - 1).rev() {
                 if map[i as usize][j as usize] == '#' {
@@ -86,7 +85,7 @@ fn run(map: &mut [Vec<char>], pos: &mut (i32, i32), inst: char) {
             pos.1 -= 1;
         },
         'v' => {
-            let mut j = pos.1;
+            let j = pos.1;
             let mut last_i = -1;
             for i in pos.0 + 1..width as i32 {
                 if map[i as usize][j as usize] == '#' {
@@ -105,7 +104,7 @@ fn run(map: &mut [Vec<char>], pos: &mut (i32, i32), inst: char) {
             pos.0 += 1;
         },
         '^' => {
-            let mut j = pos.1;
+            let j = pos.1;
             let mut last_i = -1;
             for i in (0..=pos.0 - 1).rev() {
                 if map[i as usize][j as usize] == '#' {
@@ -127,6 +126,18 @@ fn run(map: &mut [Vec<char>], pos: &mut (i32, i32), inst: char) {
     }
 }
 
+fn sum_coordinates(map: &[Vec<char>]) -> usize {
+    let mut coordinates = 0;
+    for (i, line) in map.into_iter().enumerate() {
+        for (j, c) in line.into_iter().enumerate() {
+            if *c == 'O' {
+                coordinates += i * 100 + j;
+            }
+        }
+    }
+    coordinates
+}
+
 fn main() {
     let (mut map, mut pos, instructions) = input();
     print_map(&map);
@@ -140,4 +151,7 @@ fn main() {
         println!("pos: {:?}", pos);
         print_map(&map);
     }
+    let coordinates = sum_coordinates(&map);
+    println!("----------------");
+    println!("sum of coordinates: {}", coordinates);
 }
