@@ -53,7 +53,7 @@ fn run(map: &mut [Vec<char>], pos: &mut (i32, i32), inst: char) {
                 if map[i as usize][j as usize] == '#' {
                     break;
                 } else if map[i as usize][j as usize] == '.' {
-                    last_j = j as i32;
+                    last_j = j;
                     break;
                 }
             }
@@ -72,7 +72,7 @@ fn run(map: &mut [Vec<char>], pos: &mut (i32, i32), inst: char) {
                 if map[i as usize][j as usize] == '#' {
                     break;
                 } else if map[i as usize][j as usize] == '.' {
-                    last_j = j as i32;
+                    last_j = j;
                     break;
                 }
             }
@@ -91,7 +91,7 @@ fn run(map: &mut [Vec<char>], pos: &mut (i32, i32), inst: char) {
                 if map[i as usize][j as usize] == '#' {
                     break;
                 } else if map[i as usize][j as usize] == '.' {
-                    last_i = i as i32;
+                    last_i = i;
                     break;
                 }
             }
@@ -110,7 +110,7 @@ fn run(map: &mut [Vec<char>], pos: &mut (i32, i32), inst: char) {
                 if map[i as usize][j as usize] == '#' {
                     break;
                 } else if map[i as usize][j as usize] == '.' {
-                    last_i = i as i32;
+                    last_i = i;
                     break;
                 }
             }
