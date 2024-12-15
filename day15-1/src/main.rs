@@ -128,8 +128,8 @@ fn run(map: &mut [Vec<char>], pos: &mut (i32, i32), inst: char) {
 
 fn sum_coordinates(map: &[Vec<char>]) -> usize {
     let mut coordinates = 0;
-    for (i, line) in map.into_iter().enumerate() {
-        for (j, c) in line.into_iter().enumerate() {
+    for (i, line) in map.iter().enumerate() {
+        for (j, c) in line.iter().enumerate() {
             if *c == 'O' {
                 coordinates += i * 100 + j;
             }
