@@ -38,6 +38,7 @@ struct State {
     x: i32,
     y: i32,
     dir: i32,
+    cost2: i32,
 }
 
 impl Ord for State {
@@ -52,6 +53,15 @@ impl PartialOrd for State {
     }
 }
 
+fn print_vst2(vst2: &[Vec<i32>]) {
+    for line in vst2 {
+        for c in line {
+            print!("{:3}", c);
+        }
+        println!();
+    }
+}
+
 fn print_map(map: &[Vec<char>]) {
     for line in map {
         for c in line {
@@ -61,16 +71,22 @@ fn print_map(map: &[Vec<char>]) {
     }
 }
 
-fn bfs(map: &mut [Vec<char>], s_pos: (i32, i32), e_pos: (i32, i32)) -> i32 {
+fn bfs(
+    map: &mut [Vec<char>],
+    s_pos: (i32, i32),
+    e_pos: (i32, i32),
+) -> (i32, Vec<Vec<i32>>) {
     let width = map.len();
     let height = map[0].len();
     let mut vst = vec![vec![[-1; 4]; height]; width];
+    let mut vst2 = vec![vec![-1; height]; width];
     let mut heap = BinaryHeap::new();
     heap.push(State {
         cost: 0,
         x: s_pos.0,
         y: s_pos.1,
         dir: 0,
+        cost2: 0,
     });
 
     while let Some(State {
@@ -78,16 +94,18 @@ fn bfs(map: &mut [Vec<char>], s_pos: (i32, i32), e_pos: (i32, i32)) -> i32 {
         x: cx,
         y: cy,
         dir: cd,
+        cost2: cc2,
     }) = heap.pop()
     {
         if vst[cx as usize][cy as usize][cd as usize] != -1 {
             continue;
         }
         vst[cx as usize][cy as usize][cd as usize] = cc;
+        vst2[cx as usize][cy as usize] = cc2;
         println!("----------------");
         println!("search: {}, ({}, {}), {}", cc, cx, cy, cd);
         if cx == e_pos.0 && cy == e_pos.1 {
-            return cc;
+            return (cc, vst2);
         }
 
         for i in 0..1 {
@@ -98,6 +116,7 @@ fn bfs(map: &mut [Vec<char>], s_pos: (i32, i32), e_pos: (i32, i32)) -> i32 {
             let nx = cx + dx[cd as usize];
             let ny = cy + dy[cd as usize];
             let nd = cd;
+            let nc2 = cc2 + 1;
 
             if nx < 0 || nx >= width as i32 || ny < 0 || ny >= height as i32 {
                 continue;
@@ -118,12 +137,13 @@ fn bfs(map: &mut [Vec<char>], s_pos: (i32, i32), e_pos: (i32, i32)) -> i32 {
                 3 => map[nx as usize][ny as usize] = '^',
                 _ => (),
             }
-            println!("push: {}, ({}, {}), {}", nc, nx, ny, nd);
+            println!("push: {}, ({}, {}), {}, {}", nc, nx, ny, nd, nc2);
             heap.push(State {
                 cost: nc,
                 x: nx,
                 y: ny,
                 dir: nd,
+                cost2: nc2,
             });
         }
 
@@ -132,18 +152,20 @@ fn bfs(map: &mut [Vec<char>], s_pos: (i32, i32), e_pos: (i32, i32)) -> i32 {
             let nx = cx;
             let ny = cy;
             let nd = (cd + i) % 4;
+            let nc2 = cc2;
             if vst[nx as usize][ny as usize][nd as usize] == -1 {
-                println!("push: {}, ({}, {}), {}", nc, nx, ny, nd);
+                println!("push: {}, ({}, {}), {}, {}", nc, nx, ny, nd, nc2);
                 heap.push(State {
                     cost: nc,
                     x: nx,
                     y: ny,
                     dir: nd,
+                    cost2: nc2,
                 });
             }
         }
     }
-    -1
+    (-1, vst2)
 }
 
 fn main() {
@@ -151,7 +173,7 @@ fn main() {
     print_map(&map);
     println!("s_pos: {:?}", s_pos);
     println!("e_pos: {:?}", e_pos);
-    let cost = bfs(&mut map, s_pos, e_pos);
+    let (cost, vst2) = bfs(&mut map, s_pos, e_pos);
     print_map(&map);
-    println!("cost: {}", cost);
+    print_vst2(&vst2);
 }
