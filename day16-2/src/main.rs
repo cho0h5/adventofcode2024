@@ -62,13 +62,13 @@ fn print_vst(vst0: &[Vec<[i32; 4]>]) {
     }
 }
 
-fn print_vst2(vst2: &[Vec<bool>]) {
+fn print_vst2(vst2: &[Vec<i32>]) {
     for line in vst2 {
         for c in line {
-            if *c {
-                print!("#");
+            if *c == -1 {
+                print!("    ");
             } else {
-                print!(".");
+                print!("{:4}", c);
             }
         }
         println!();
@@ -173,23 +173,23 @@ fn bfs(
     (-1, vst)
 }
 
-fn bfs_vst(vst: &[Vec<[i32; 4]>], e_pos: (i32, i32)) -> (i32, Vec<Vec<bool>>) {
+fn bfs_vst(vst: &[Vec<[i32; 4]>], e_pos: (i32, i32)) -> (i32, Vec<Vec<i32>>) {
     let width = vst.len();
     let height = vst[0].len();
-    let mut vst2 = vec![vec![false; height]; width];
+    let mut vst2 = vec![vec![-1; height]; width];
     let mut seats = 0;
     let mut deque = VecDeque::new();
 
     let cx = e_pos.0;
     let cy = e_pos.1;
     let cc = vst[cx as usize][cy as usize];
-    deque.push_back((cx, cy, cc));
+    deque.push_back((cx, cy, cc, 0));
 
-    while let Some((cx, cy, cc)) = deque.pop_front() {
-        if vst2[cx as usize][cy as usize] {
+    while let Some((cx, cy, cc, cc2)) = deque.pop_front() {
+        if vst2[cx as usize][cy as usize] != -1 {
             continue;
         }
-        vst2[cx as usize][cy as usize] = true;
+        vst2[cx as usize][cy as usize] = cc2;
         seats += 1;
 
         let dx = [0, 1, 0, -1];
@@ -198,17 +198,18 @@ fn bfs_vst(vst: &[Vec<[i32; 4]>], e_pos: (i32, i32)) -> (i32, Vec<Vec<bool>>) {
         for i in 0..4 {
             let nx = cx + dx[i];
             let ny = cy + dy[i];
+            let nc2 = cc2 + 1;
             if nx < 0 || nx >= width as i32 || ny < 0 || ny >= height as i32 {
                 continue;
             }
-            if vst2[nx as usize][ny as usize] {
+            if vst2[nx as usize][ny as usize] != -1 {
                 continue;
             }
 
             let nc = vst[nx as usize][ny as usize];
             for j in 0..4 {
                 if nc[j] != -1 && cc[j] - nc[j] == 1 {
-                    deque.push_back((nx, ny, nc));
+                    deque.push_back((nx, ny, nc, nc2));
                     break;
                 }
             }
