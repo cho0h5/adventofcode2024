@@ -117,7 +117,7 @@ fn bfs(
             return (cc, vst);
         }
 
-        for i in 0..1 {
+        for _ in 0..1 {
             let dx = [0, 1, 0, -1];
             let dy = [1, 0, -1, 0];
 
