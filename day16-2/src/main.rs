@@ -58,9 +58,9 @@ fn print_vst3(vst2: &[Vec<bool>]) {
     for line in vst2 {
         for c in line {
             if *c {
-                print!("#");
+                print!("  ##");
             } else {
-                print!(" ");
+                print!("    ");
             }
         }
         println!();
@@ -71,9 +71,9 @@ fn print_vst2(vst2: &[Vec<i32>]) {
     for line in vst2 {
         for c in line {
             if *c == 999999999 {
-                print!("   ");
+                print!("    ");
             } else {
-                print!("{:3}", c);
+                print!("{:4}", c);
             }
         }
         println!();
@@ -233,9 +233,9 @@ fn main() {
     println!("e_pos: {:?}", e_pos);
     let (cost, vst2) = bfs(&mut map, s_pos, e_pos);
     println!("cost: {:?}", cost);
-    // print_map(&map);
-    // print_vst2(&vst2);
+    print_map(&map);
+    print_vst2(&vst2);
     let (seats, vst3) = bfs_vst2(&vst2, e_pos);
     println!("seats: {:?}", seats);
-    // print_vst3(&vst3);
+    print_vst3(&vst3);
 }
