@@ -96,7 +96,7 @@ fn bfs(
 ) -> (i32, Vec<Vec<i32>>) {
     let width = map.len();
     let height = map[0].len();
-    let mut vst = vec![vec![[999999999; 4]; height]; width];
+    let mut vst = vec![vec![[-1; 4]; height]; width];
     let mut vst2 = vec![vec![999999999; height]; width];
     let mut heap = BinaryHeap::new();
     heap.push(State {
@@ -115,7 +115,7 @@ fn bfs(
         cost2: cc2,
     }) = heap.pop()
     {
-        if vst[cx as usize][cy as usize][cd as usize] <= cc
+        if vst[cx as usize][cy as usize][cd as usize] != -1
             || vst2[cx as usize][cy as usize] < cc2
         {
             continue;
@@ -146,7 +146,7 @@ fn bfs(
                 continue;
             }
 
-            if vst[nx as usize][ny as usize][nd as usize] <= nc {
+            if vst[nx as usize][ny as usize][nd as usize] != -1 {
                 continue;
             }
 
@@ -173,7 +173,7 @@ fn bfs(
             let ny = cy;
             let nd = (cd + i) % 4;
             let nc2 = cc2;
-            if vst[nx as usize][ny as usize][nd as usize] >= nc {
+            if vst[nx as usize][ny as usize][nd as usize] == -1 {
                 // println!("push: {}, ({}, {}), {}, {}", nc, nx, ny, nd, nc2);
                 heap.push(State {
                     cost: nc,
