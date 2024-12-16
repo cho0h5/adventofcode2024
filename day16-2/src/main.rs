@@ -217,7 +217,7 @@ fn bfs_vst2(vst2: &[Vec<i32>], e_pos: (i32, i32)) -> (i32, Vec<Vec<bool>>) {
                 continue;
             }
             let nc = vst2[nx as usize][ny as usize];
-            if nc == -1 || nc != cc - 1 {
+            if nc == -1 || nc >= cc {
                 continue;
             }
             deque.push_back((nx, ny, nc));
