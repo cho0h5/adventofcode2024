@@ -1,5 +1,6 @@
 use std::cmp::Ordering;
 use std::collections::BinaryHeap;
+use std::collections::VecDeque;
 use std::env;
 use std::fs::read_to_string;
 
@@ -53,10 +54,27 @@ impl PartialOrd for State {
     }
 }
 
+fn print_vst3(vst2: &[Vec<bool>]) {
+    for line in vst2 {
+        for c in line {
+            if *c {
+                print!("#");
+            } else {
+                print!(" ");
+            }
+        }
+        println!();
+    }
+}
+
 fn print_vst2(vst2: &[Vec<i32>]) {
     for line in vst2 {
         for c in line {
-            print!("{:3}", c);
+            if *c == -1 {
+                print!("   ");
+            } else {
+                print!("{:3}", c);
+            }
         }
         println!();
     }
@@ -102,8 +120,8 @@ fn bfs(
         }
         vst[cx as usize][cy as usize][cd as usize] = cc;
         vst2[cx as usize][cy as usize] = cc2;
-        println!("----------------");
-        println!("search: {}, ({}, {}), {}", cc, cx, cy, cd);
+        // println!("----------------");
+        // println!("search: {}, ({}, {}), {}", cc, cx, cy, cd);
         if cx == e_pos.0 && cy == e_pos.1 {
             return (cc, vst2);
         }
@@ -137,7 +155,7 @@ fn bfs(
                 3 => map[nx as usize][ny as usize] = '^',
                 _ => (),
             }
-            println!("push: {}, ({}, {}), {}, {}", nc, nx, ny, nd, nc2);
+            // println!("push: {}, ({}, {}), {}, {}", nc, nx, ny, nd, nc2);
             heap.push(State {
                 cost: nc,
                 x: nx,
@@ -154,7 +172,7 @@ fn bfs(
             let nd = (cd + i) % 4;
             let nc2 = cc2;
             if vst[nx as usize][ny as usize][nd as usize] == -1 {
-                println!("push: {}, ({}, {}), {}, {}", nc, nx, ny, nd, nc2);
+                // println!("push: {}, ({}, {}), {}, {}", nc, nx, ny, nd, nc2);
                 heap.push(State {
                     cost: nc,
                     x: nx,
@@ -168,12 +186,53 @@ fn bfs(
     (-1, vst2)
 }
 
+fn bfs_vst2(vst2: &[Vec<i32>], e_pos: (i32, i32)) -> (i32, Vec<Vec<bool>>) {
+    let width = vst2.len();
+    let height = vst2[0].len();
+    let mut vst3 = vec![vec![false; height]; width];
+    let mut seats = 0;
+    let mut deque = VecDeque::new();
+    let sc = vst2[e_pos.0 as usize][e_pos.1 as usize];
+    deque.push_back((e_pos.0, e_pos.1, sc));
+
+    while let Some((cx, cy, cc)) = deque.pop_front() {
+        if vst3[cx as usize][cy as usize] {
+            continue;
+        }
+        vst3[cx as usize][cy as usize] = true;
+        seats += 1;
+
+        let dx = [0, 1, 0, -1];
+        let dy = [1, 0, -1, 0];
+
+        for i in 0..4 {
+            let nx = cx + dx[i];
+            let ny = cy + dy[i];
+            if nx < 0 || nx >= width as i32 || ny < 0 || ny >= height as i32 {
+                continue;
+            }
+            if vst3[nx as usize][ny as usize] {
+                continue;
+            }
+            let nc = vst2[nx as usize][ny as usize];
+            if nc == -1 || nc != cc - 1 {
+                continue;
+            }
+            deque.push_back((nx, ny, nc));
+        }
+    }
+    (seats, vst3)
+}
+
 fn main() {
     let (mut map, s_pos, e_pos) = input();
     print_map(&map);
     println!("s_pos: {:?}", s_pos);
     println!("e_pos: {:?}", e_pos);
     let (cost, vst2) = bfs(&mut map, s_pos, e_pos);
-    print_map(&map);
+    // print_map(&map);
     print_vst2(&vst2);
+    let (seats, vst3) = bfs_vst2(&vst2, e_pos);
+    println!("seats: {:?}", seats);
+    print_vst3(&vst3);
 }
