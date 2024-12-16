@@ -41,10 +41,14 @@ fn input() -> (Vec<Vec<char>>, (i32, i32), Vec<char>) {
     (map, start_point, instructions)
 }
 
-fn print_map(map: &[Vec<char>]) {
-    for line in map {
-        for c in line {
-            print!("{}", c);
+fn print_map(map: &[Vec<char>], pos: (i32, i32)) {
+    for (i, line) in map.iter().enumerate() {
+        for (j, c) in line.iter().enumerate() {
+            if i == pos.0 as usize && j == pos.1 as usize {
+                print!("@");
+            } else {
+                print!("{}", c);
+            }
         }
         println!();
     }
@@ -141,16 +145,16 @@ fn move_down(map: &mut [Vec<char>], x: i32, y: i32) {
     let current_char = map[x as usize][y as usize];
     match current_char {
         '[' => {
-            move_up(map, x + 1, y);
-            move_up(map, x + 1, y + 1);
+            move_down(map, x + 1, y);
+            move_down(map, x + 1, y + 1);
             map[x as usize][y as usize] = '.';
             map[x as usize][y as usize + 1] = '.';
             map[x as usize + 1][y as usize] = '[';
             map[x as usize + 1][y as usize + 1] = ']';
         }
         ']' => {
-            move_up(map, x + 1, y - 1);
-            move_up(map, x + 1, y);
+            move_down(map, x + 1, y - 1);
+            move_down(map, x + 1, y);
             map[x as usize][y as usize] = '.';
             map[x as usize][y as usize - 1] = '.';
             map[x as usize + 1][y as usize] = ']';
@@ -161,12 +165,13 @@ fn move_down(map: &mut [Vec<char>], x: i32, y: i32) {
 }
 
 fn run(map: &mut [Vec<char>], pos: &mut (i32, i32), inst: char) {
-    let width = map.len();
-    let height = map[0].len();
     match inst {
         '>' if move_right(map, pos.0, pos.1 + 1) => pos.1 += 1,
         '<' if move_left(map, pos.0, pos.1 - 1) => pos.1 -= 1,
-        'v' if move_down_check(map, pos.0 + 1, pos.1) => pos.0 += 1,
+        'v' if move_down_check(map, pos.0 + 1, pos.1) => {
+            move_down(map, pos.0 + 1, pos.1);
+            pos.0 += 1;
+        }
         '^' if move_up_check(map, pos.0 - 1, pos.1) => {
             move_up(map, pos.0 - 1, pos.1);
             pos.0 -= 1;
@@ -189,7 +194,7 @@ fn sum_coordinates(map: &[Vec<char>]) -> usize {
 
 fn main() {
     let (mut map, mut pos, instructions) = input();
-    print_map(&map);
+    print_map(&map, pos);
     println!("start_point: {:?}", pos);
     println!("instructions: {:?}", instructions);
 
@@ -198,7 +203,7 @@ fn main() {
         println!("----------------");
         println!("inst: {}", inst);
         println!("pos: {:?}", pos);
-        print_map(&map);
+        print_map(&map, pos);
     }
     let coordinates = sum_coordinates(&map);
     println!("----------------");
