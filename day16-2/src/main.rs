@@ -70,7 +70,7 @@ fn print_vst3(vst2: &[Vec<bool>]) {
 fn print_vst2(vst2: &[Vec<i32>]) {
     for line in vst2 {
         for c in line {
-            if *c == -1 {
+            if *c == 999999999 {
                 print!("   ");
             } else {
                 print!("{:3}", c);
@@ -96,8 +96,8 @@ fn bfs(
 ) -> (i32, Vec<Vec<i32>>) {
     let width = map.len();
     let height = map[0].len();
-    let mut vst = vec![vec![[-1; 4]; height]; width];
-    let mut vst2 = vec![vec![-1; height]; width];
+    let mut vst = vec![vec![[999999999; 4]; height]; width];
+    let mut vst2 = vec![vec![999999999; height]; width];
     let mut heap = BinaryHeap::new();
     heap.push(State {
         cost: 0,
@@ -115,13 +115,15 @@ fn bfs(
         cost2: cc2,
     }) = heap.pop()
     {
-        if vst[cx as usize][cy as usize][cd as usize] != -1 {
+        if vst[cx as usize][cy as usize][cd as usize] <= cc
+            || vst2[cx as usize][cy as usize] < cc2
+        {
             continue;
         }
         vst[cx as usize][cy as usize][cd as usize] = cc;
         vst2[cx as usize][cy as usize] = cc2;
         // println!("----------------");
-        // println!("search: {}, ({}, {}), {}", cc, cx, cy, cd);
+        // println!("search: {}, ({}, {}), {}, {}", cc, cx, cy, cd, cc2);
         if cx == e_pos.0 && cy == e_pos.1 {
             return (cc, vst2);
         }
@@ -144,7 +146,7 @@ fn bfs(
                 continue;
             }
 
-            if vst[nx as usize][ny as usize][nd as usize] != -1 {
+            if vst[nx as usize][ny as usize][nd as usize] <= nc {
                 continue;
             }
 
@@ -171,7 +173,7 @@ fn bfs(
             let ny = cy;
             let nd = (cd + i) % 4;
             let nc2 = cc2;
-            if vst[nx as usize][ny as usize][nd as usize] == -1 {
+            if vst[nx as usize][ny as usize][nd as usize] >= nc {
                 // println!("push: {}, ({}, {}), {}, {}", nc, nx, ny, nd, nc2);
                 heap.push(State {
                     cost: nc,
@@ -230,9 +232,10 @@ fn main() {
     println!("s_pos: {:?}", s_pos);
     println!("e_pos: {:?}", e_pos);
     let (cost, vst2) = bfs(&mut map, s_pos, e_pos);
+    println!("cost: {:?}", cost);
     // print_map(&map);
-    print_vst2(&vst2);
+    // print_vst2(&vst2);
     let (seats, vst3) = bfs_vst2(&vst2, e_pos);
     println!("seats: {:?}", seats);
-    print_vst3(&vst3);
+    // print_vst3(&vst3);
 }
