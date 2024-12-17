@@ -84,8 +84,8 @@ impl Computer {
 
         match opcode {
             0 => self.reg_a /= 2_usize.pow(self.combo(operand) as u32),
-            1 => self.reg_b = operand % 8,
-            2 => self.reg_b ^= self.combo(operand) % 8,
+            1 => self.reg_b ^= operand % 8,
+            2 => self.reg_b = self.combo(operand) % 8,
             3 if self.reg_a != 0 => self.pc = operand,
             4 => self.reg_b ^= self.reg_c,
             5 => print!("{},", self.combo(operand) % 8),
