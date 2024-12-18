@@ -24,10 +24,9 @@ fn solve_update(orders: &Vec<(i32, i32)>, update: &Vec<i32>) -> bool {
     true
 }
 
-fn main() {
+fn input() -> (Vec<(i32, i32)>, Vec<Vec<i32>>) {
     let mut orders = vec![];
     let mut updates = vec![];
-
     let filename = env::args().nth(1).unwrap();
     for line in read_to_string(filename).unwrap().lines() {
         let numbers: Vec<&str> = line.split('|').collect();
@@ -48,11 +47,15 @@ fn main() {
             updates.push(numbers);
         }
     }
+    (orders, updates)
+}
 
+fn main() {
+    let (orders, updates) = input();
     let mut incorrect_update = vec![];
     for update in updates.iter() {
         if solve_update(&orders, update) {
-            println!("passed");
+            println!("passed: {:?}", update);
         } else {
             println!("failed: {:?}", update);
             incorrect_update.push(update);
