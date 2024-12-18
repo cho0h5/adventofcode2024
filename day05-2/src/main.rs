@@ -50,29 +50,37 @@ fn input() -> (Vec<(i32, i32)>, Vec<Vec<i32>>) {
     (orders, updates)
 }
 
-fn generate_permutations(
-    orders: &Vec<(i32, i32)>,
-    update: &mut [i32],
-    start: usize,
-) -> i32 {
-    if start == update.len() {
-        // println!("start: {:?}", update);
-        if solve_update(&orders, update) {
-            return update[update.len() / 2];
-        } else {
-            return -1;
+fn sort_update(orders: &Vec<(i32, i32)>, update: &mut Vec<i32>) -> Vec<i32> {
+    fn find_minimum(orders: &Vec<(i32, i32)>, update: &Vec<i32>) -> usize {
+        if update.len() == 1 {
+            return 0;
         }
-    }
+        for (i, num1) in update.iter().enumerate() {
+            'outer: for (j, num2) in update.iter().enumerate() {
+                if i == j {
+                    continue;
+                }
+                // println!("hi: {}, {}", num1, num2);
+                for order in orders {
+                    // println!("hi: {:?}", order);
+                    if order.0 == *num2 && order.1 == *num1 {
+                        break 'outer;
+                    }
+                }
+                return i;
+            }
+        }
+        usize::MAX
+    };
 
-    for i in start..update.len() {
-        update.swap(start, i);
-        let res = generate_permutations(orders, update, start + 1);
-        if res != -1 {
-            return res;
-        }
-        update.swap(start, i);
+    let mut sorted = Vec::new();
+    while !update.is_empty() {
+        println!("curr update: {:?}", update);
+        let minimum = find_minimum(orders, update);
+        sorted.push(update[minimum]);
+        update.remove(minimum);
     }
-    -1
+    sorted
 }
 
 fn main() {
@@ -86,12 +94,15 @@ fn main() {
             incorrect_update.push(update.clone());
         }
     }
+    println!("----------------");
 
     let mut sum = 0;
     for update in incorrect_update.iter_mut() {
-        let res = generate_permutations(&orders, &mut update[..], 0);
-        println!("mid: {}", res);
-        sum += res;
+        let sorted_update = sort_update(&orders, update);
+        println!("sorted update: {:?}", sorted_update);
+        let mid = sorted_update[sorted_update.len() / 2];
+        println!("mid: {}", mid);
+        sum += mid;
     }
     println!("sum: {}", sum);
 }
