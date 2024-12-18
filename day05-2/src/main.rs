@@ -55,27 +55,28 @@ fn sort_update(orders: &Vec<(i32, i32)>, update: &mut Vec<i32>) -> Vec<i32> {
         if update.len() == 1 {
             return 0;
         }
-        for (i, num1) in update.iter().enumerate() {
-            'outer: for (j, num2) in update.iter().enumerate() {
+        'outer: for (i, num1) in update.iter().enumerate() {
+            for (j, num2) in update.iter().enumerate() {
                 if i == j {
                     continue;
                 }
-                // println!("hi: {}, {}", num1, num2);
                 for order in orders {
-                    // println!("hi: {:?}", order);
                     if order.0 == *num2 && order.1 == *num1 {
-                        break 'outer;
+                        // println!("critical: {:?}", order);
+                        continue 'outer;
+                    } else if order.0 == *num1 && order.1 == *num2 {
+                        // println!("pass: {:?}", order);
                     }
                 }
-                return i;
             }
+            return i;
         }
         usize::MAX
     };
 
     let mut sorted = Vec::new();
     while !update.is_empty() {
-        println!("curr update: {:?}", update);
+        // println!("curr update: {:?}", update);
         let minimum = find_minimum(orders, update);
         sorted.push(update[minimum]);
         update.remove(minimum);
