@@ -12,13 +12,13 @@ fn input() -> Vec<FragState> {
 
     let filename = env::args().nth(1).unwrap();
     let binding = read_to_string(filename).unwrap();
-    let line = binding.lines().nth(0).unwrap();
+    let line = binding.lines().next().unwrap();
     for (i, c) in line.chars().enumerate() {
         let num = c as usize - '0' as usize;
         if i % 2 == 0 {
             disk.push(FragState::File {
                 size: num,
-                id: i as usize / 2,
+                id: i / 2,
             });
         } else {
             disk.push(FragState::Free { size: num });
@@ -125,7 +125,7 @@ fn print_disk(disk: &[FragState]) {
     print!("disk: [");
     for num in temp {
         if num == -1 {
-            print!("{} ", '.');
+            print!(". ");
         } else {
             print!("{} ", num);
         }
