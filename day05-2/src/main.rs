@@ -1,7 +1,7 @@
 use std::env;
 use std::fs::read_to_string;
 
-fn solve_update(orders: &Vec<(i32, i32)>, update: &Vec<i32>) -> bool {
+fn solve_update(orders: &Vec<(i32, i32)>, update: &[i32]) -> bool {
     fn is_valid(orders: &Vec<(i32, i32)>, a: i32, b: i32) -> bool {
         for order in orders {
             if order.0 == b && order.1 == a {
@@ -50,15 +50,48 @@ fn input() -> (Vec<(i32, i32)>, Vec<Vec<i32>>) {
     (orders, updates)
 }
 
+fn generate_permutations(
+    orders: &Vec<(i32, i32)>,
+    update: &mut [i32],
+    start: usize,
+) -> i32 {
+    if start == update.len() {
+        // println!("start: {:?}", update);
+        if solve_update(&orders, update) {
+            return update[update.len() / 2];
+        } else {
+            return -1;
+        }
+    }
+
+    for i in start..update.len() {
+        update.swap(start, i);
+        let res = generate_permutations(orders, update, start + 1);
+        if res != -1 {
+            return res;
+        }
+        update.swap(start, i);
+    }
+    -1
+}
+
 fn main() {
     let (orders, updates) = input();
     let mut incorrect_update = vec![];
     for update in updates.iter() {
         if solve_update(&orders, update) {
-            println!("passed: {:?}", update);
+            println!("passed");
         } else {
             println!("failed: {:?}", update);
-            incorrect_update.push(update);
+            incorrect_update.push(update.clone());
         }
     }
+
+    let mut sum = 0;
+    for update in incorrect_update.iter_mut() {
+        let res = generate_permutations(&orders, &mut update[..], 0);
+        println!("mid: {}", res);
+        sum += res;
+    }
+    println!("sum: {}", sum);
 }
