@@ -2,8 +2,10 @@ use std::collections::VecDeque;
 use std::env;
 use std::fs::read_to_string;
 
-const WIDTH: usize = 7;
-const HEIGHT: usize = 7;
+// const WIDTH: usize = 7;
+// const HEIGHT: usize = 7;
+const WIDTH: usize = 71;
+const HEIGHT: usize = 71;
 
 struct Computer {
     memory: Vec<Vec<char>>,
@@ -25,7 +27,7 @@ fn input() -> Computer {
 
     let memory = vec![vec!['.'; HEIGHT]; WIDTH];
     let vst = vec![vec![usize::MAX; HEIGHT]; WIDTH];
-    let deque = VecDeque::from(vec![(0, 0, 1)]);
+    let deque = VecDeque::from(vec![(0, 0, 0)]);
 
     Computer {
         memory,
@@ -94,15 +96,16 @@ impl Computer {
 fn main() {
     let mut computer = input();
     println!("coords: {:?}", computer.coords);
+
+    for i in 0..1024 {
+        computer.collapse_step();
+    }
     computer.print_memory();
 
-    for i in 0..computer.coords.len() + 1 {
-        println!("------ i: {} ------", i);
+    loop {
         if let Some(cost) = computer.bfs_step() {
             println!("cost: {}", cost);
             break;
         }
-        computer.collapse_step();
-        computer.print_memory();
     }
 }
