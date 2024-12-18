@@ -28,7 +28,54 @@ fn input() -> Vec<FragState> {
     disk
 }
 
-fn compacting(disk: &mut Vec<FragState>) {}
+fn compacting(disk: &mut Vec<FragState>) {
+    for tail in (0..disk.len()).rev() {
+        if let FragState::Free { .. } = disk[tail] {
+            continue;
+        }
+        for head in 0..tail {
+            if let FragState::File { .. } = disk[head] {
+                continue;
+            }
+            if let FragState::Free { size } = disk[head] {
+                if size == 0 {
+                    continue;
+                }
+            }
+
+            let FragState::Free { size: fr_size } = disk[head] else {
+                panic!("no way");
+            };
+            let FragState::File {
+                size: fl_size,
+                id: fl_id,
+            } = disk[tail]
+            else {
+                panic!("no way");
+            };
+
+            if fr_size >= fl_size {
+                println!(
+                    "possible situation: {:?}, {:?}",
+                    disk[head], disk[tail]
+                );
+
+                disk[head] = FragState::Free {
+                    size: fr_size - fl_size,
+                };
+                disk[tail] = FragState::Free { size: fl_size };
+                disk.insert(
+                    head,
+                    FragState::File {
+                        size: fl_size,
+                        id: fl_id,
+                    },
+                );
+                break;
+            }
+        }
+    }
+}
 
 fn checksum(disk: &Vec<FragState>) -> usize {
     let mut sum = 0;
