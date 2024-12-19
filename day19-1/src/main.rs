@@ -21,18 +21,27 @@ fn input() -> (Vec<String>, Vec<String>) {
     (availables, wanteds)
 }
 
-fn is_possible(availables: &[String], wanted: &str, pos: usize) -> bool {
+fn is_possible(
+    availables: &[String],
+    wanted: &str,
+    pos: usize,
+    count: &mut usize,
+) -> bool {
     if wanted.len() == pos {
         return true;
+    }
+    if *count > 10337031 {
+        return false;
     }
 
     for avail in availables {
         if wanted[pos..].starts_with(avail) {
-            println!("looip: {}, {}", pos, &wanted[..pos]);
-            if is_possible(availables, wanted, pos + avail.len()) {
+            // println!("looip: {}, {}, {}", pos, &wanted[..pos], count);
+            if is_possible(availables, wanted, pos + avail.len(), count) {
                 return true;
             }
         }
+        *count += 1;
     }
     false
 }
@@ -44,7 +53,7 @@ fn main() {
 
     let mut count = 0;
     for wanted in wanteds {
-        let is_possible = is_possible(&availables, &wanted, 0);
+        let is_possible = is_possible(&availables, &wanted, 0, &mut 0);
         println!("{} <- {}", is_possible, wanted);
         if is_possible {
             count += 1;
