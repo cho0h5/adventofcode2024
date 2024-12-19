@@ -1,4 +1,3 @@
-use std::collections::VecDeque;
 use std::env;
 use std::fs::read_to_string;
 
@@ -8,7 +7,7 @@ fn input() -> (Vec<String>, Vec<String>) {
     let filename = env::args().nth(1).unwrap();
     let binding = read_to_string(filename).unwrap();
     let mut iterator = binding.lines();
-    let mut availables = iterator
+    let availables = iterator
         .next()
         .unwrap()
         .split(", ")
