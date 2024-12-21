@@ -9,6 +9,7 @@ struct Map {
     cost: Vec<Vec<usize>>,
     width: usize,
     height: usize,
+    limit: usize,
 }
 
 impl Map {
@@ -42,6 +43,7 @@ impl Map {
             cost,
             width,
             height,
+            limit: 2,
         }
     }
 
@@ -106,10 +108,66 @@ impl Map {
             println!();
         }
     }
+
+    fn use_skill(&self, pos: (usize, usize)) {
+        fn print_vst(vst: &Vec<Vec<usize>>) {
+            for line in vst {
+                for c in line {
+                    if *c == usize::MAX {
+                        print!("{:3}", " ");
+                    } else {
+                        print!("{:3}", c);
+                    }
+                }
+                println!();
+            }
+        }
+        let mut vst = vec![vec![usize::MAX; self.height]; self.width];
+        let mut deque = VecDeque::from(vec![(pos.0 as i32, pos.1 as i32, 0)]);
+
+        while let Some((cx, cy, cc)) = deque.pop_front() {
+            if cc >= vst[cx as usize][cy as usize] {
+                continue;
+            }
+            vst[cx as usize][cy as usize] = cc;
+
+            //            if self.map[nx as usize][ny as usize] == '#' {
+            //                continue;
+            //            }
+
+            for i in 0..4 {
+                let dx = [0, 1, 0, -1];
+                let dy = [1, 0, -1, 0];
+
+                let nx = cx + dx[i];
+                let ny = cy + dy[i];
+                let nc = cc + 1;
+                if nx < 0
+                    || nx >= self.width as i32
+                    || ny < 0
+                    || ny >= self.height as i32
+                {
+                    continue;
+                }
+                if nc >= vst[nx as usize][ny as usize] {
+                    continue;
+                }
+                if nc > self.limit {
+                    continue;
+                }
+
+                deque.push_back((nx, ny, nc));
+            }
+        }
+
+        print_vst(&vst);
+    }
 }
 
 fn main() {
     let mut map = Map::new();
     map.bfs_cost();
     map.print();
+
+    map.use_skill((2, 4));
 }
