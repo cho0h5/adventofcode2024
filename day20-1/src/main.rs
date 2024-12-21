@@ -2,6 +2,8 @@ use std::collections::VecDeque;
 use std::env;
 use std::fs::read_to_string;
 
+const SAVE_THRESHOLD: i128 = 100;
+
 struct Map {
     map: Vec<Vec<char>>,
     start: (usize, usize),
@@ -141,7 +143,7 @@ impl Map {
                     - self.cost[cx as usize][cy as usize] as i128;
                 let new_cost = cc as i128;
                 let save = old_cost - new_cost;
-                if save > 0 {
+                if save >= SAVE_THRESHOLD {
                     count += 1;
                     println!("({}, {}), {}", cx, cy, save);
                 }
