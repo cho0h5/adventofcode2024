@@ -45,7 +45,7 @@ impl Map {
             cost,
             width,
             height,
-            limit: 2,
+            limit: 20,
         }
     }
 
