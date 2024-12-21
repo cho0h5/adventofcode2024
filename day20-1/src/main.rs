@@ -109,7 +109,7 @@ impl Map {
         }
     }
 
-    fn use_skill(&self, pos: (usize, usize)) {
+    fn use_skill(&self, pos: (usize, usize)) -> usize {
         fn print_vst(vst: &Vec<Vec<usize>>) {
             for line in vst {
                 for c in line {
@@ -125,15 +125,27 @@ impl Map {
         let mut vst = vec![vec![usize::MAX; self.height]; self.width];
         let mut deque = VecDeque::from(vec![(pos.0 as i32, pos.1 as i32, 0)]);
 
+        if self.map[pos.0][pos.1] == '#' {
+            return 0;
+        }
+
+        let mut count = 0;
         while let Some((cx, cy, cc)) = deque.pop_front() {
             if cc >= vst[cx as usize][cy as usize] {
                 continue;
             }
             vst[cx as usize][cy as usize] = cc;
 
-            //            if self.map[nx as usize][ny as usize] == '#' {
-            //                continue;
-            //            }
+            if self.map[cx as usize][cy as usize] != '#' {
+                let old_cost = self.cost[pos.0][pos.1] as i128
+                    - self.cost[cx as usize][cy as usize] as i128;
+                let new_cost = cc as i128;
+                let save = old_cost - new_cost;
+                if save > 0 {
+                    count += 1;
+                    println!("({}, {}), {}", cx, cy, save);
+                }
+            }
 
             for i in 0..4 {
                 let dx = [0, 1, 0, -1];
@@ -160,7 +172,9 @@ impl Map {
             }
         }
 
-        print_vst(&vst);
+        // print_vst(&vst);
+
+        count
     }
 }
 
@@ -169,5 +183,13 @@ fn main() {
     map.bfs_cost();
     map.print();
 
-    map.use_skill((2, 4));
+    let mut count = 0;
+    for i in 0..map.width {
+        for j in 0..map.height {
+            let result = map.use_skill((i, j));
+            // println!("save: {}", save);
+            count += result;
+        }
+    }
+    println!("count: {}", count);
 }
