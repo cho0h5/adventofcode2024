@@ -78,14 +78,14 @@ fn generate_directional_map() -> DirectionalMap {
     map.insert(('A', 'A'), "A");
     map.insert(('A', '^'), "<A");
     map.insert(('A', '<'), "v<<A");
-    map.insert(('A', 'v'), "<vA"); // v< <v
+    map.insert(('A', 'v'), "<vA"); // v< 324 <v 423
     map.insert(('A', '>'), "vA");
 
     map.insert(('^', 'A'), ">A");
     map.insert(('^', '^'), "A");
     map.insert(('^', '<'), "v<A");
     map.insert(('^', 'v'), "vA");
-    map.insert(('^', '>'), ">vA"); // >v v>
+    map.insert(('^', '>'), ">vA"); // >v vt
 
     map.insert(('<', 'A'), ">>^A");
     map.insert(('<', '^'), ">^A");
