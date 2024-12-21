@@ -37,15 +37,34 @@ fn generate_numeric_map() -> NumericMap {
     map.insert(('A', '1'), "^<<A");
     map.insert(('1', '7'), "^^A");
     map.insert(('7', '9'), ">>A");
-    // map.insert(('9', 'A'), "A");
 
-    map.insert(('A', '4'), "^^<A");
+    map.insert(('A', '4'), "^^<<A");
     map.insert(('4', '5'), ">A");
     map.insert(('5', '6'), ">A");
     map.insert(('6', 'A'), "vvA");
 
     map.insert(('A', '3'), "^A");
     map.insert(('3', '7'), "<<^^A"); // <<^^ ^^<<
+
+    //
+
+    map.insert(('A', '8'), "<^^^A"); // <^^^ ^^^<
+    map.insert(('8', '3'), ">vvA"); // >vv vv>
+    map.insert(('3', '9'), "^^A");
+
+    map.insert(('1', '6'), "^>>A"); // >>^ ^>>
+    map.insert(('6', '9'), "^A");
+
+    map.insert(('A', '5'), "<^^A"); // <^^ ^^<
+    map.insert(('5', '7'), "<^A"); // <^ ^<
+
+    map.insert(('A', '6'), "^^A");
+    map.insert(('6', '7'), "^<<A"); // ^<< <<^
+    map.insert(('7', '0'), ">vvvA");
+
+    map.insert(('6', '3'), "vA");
+    map.insert(('3', '8'), "<^^A"); // <^^ ^^<
+    map.insert(('8', 'A'), ">vvvA"); // >vvv vvv>
 
     map
 }
@@ -125,6 +144,7 @@ fn main() {
     let numeric_map = generate_numeric_map();
     let directional_map = generate_directional_map();
 
+    let mut sum = 0;
     for code in &codes {
         let resolved1s = resolve_numeric_keypad(&numeric_map, code);
         println!("----------------");
@@ -137,6 +157,17 @@ fn main() {
             println!("resolved1: {}", resolved1);
             println!("resolved2: {}", resolved2);
             println!("resolved3: {}", resolved3);
+
+            let len = resolved3.len();
+            let numeric_part =
+                code[0..code.len() - 1].parse::<usize>().unwrap();
+            let complexity = len * numeric_part;
+            println!(
+                "len: {}, numeric_part: {}, complexity: {}",
+                len, numeric_part, complexity
+            );
+            sum += complexity;
         }
     }
+    println!("sum: {}", sum);
 }
