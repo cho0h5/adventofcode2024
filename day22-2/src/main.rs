@@ -56,11 +56,11 @@ fn main() {
                 deltas[i][j - 1],
                 deltas[i][j - 0],
             ))
-            .and_modify(|v| {
-                if *v < prices[i][j] {
-                    *v = prices[i][j];
-                }
-            })
+            //             .and_modify(|v| {
+            //                 if *v < prices[i][j] {
+            //                     *v = prices[i][j];
+            //                 }
+            //             })
             .or_insert(prices[i][j]);
         }
         map.push(m);
@@ -72,12 +72,24 @@ fn main() {
         for (key, value) in m {
             merged_map
                 .entry(key)
-                .and_modify(|v| *v += value)
-                .or_insert(value);
+                .and_modify(|v: &mut Vec<u64>| v.push(value))
+                .or_insert(vec![value]);
         }
     }
-    // println!("{:#?}", merged_map);
 
-    let maximum = merged_map.values().max();
-    println!("maximum: {}", maximum.unwrap());
+    let mut maximum = 0;
+    let mut maximum_value = Vec::new();
+    let mut maximum_key = (0, 0, 0, 0);
+    for (k, v) in merged_map {
+        let sum = v.iter().sum();
+        if sum > maximum {
+            maximum = sum;
+            maximum_value = v;
+            maximum_key = k;
+        }
+    }
+    println!(
+        "maximum: ({:?}, {:?}, {})",
+        maximum_key, maximum_value, maximum
+    );
 }
