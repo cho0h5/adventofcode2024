@@ -65,15 +65,32 @@ impl NumKey {
         }
     }
 
-    fn cal_key(code: &str) {
+    fn cal_key(code: &str) -> usize {
         let code = code.as_bytes();
 
+        let mut cost = 0;
         for i in 0..code.len() - 1 {
-            println!("{} {}", code[i] as char, code[i + 1] as char);
             let paths =
                 Self::gen_numkey_path(code[i] as char, code[i + 1] as char);
-            println!("{:?}", paths);
+            // println!("--------");
+            // println!(
+            // "from: {}, to: {}, paths: {:?}",
+            // code[i] as char,
+            // code[i + 1] as char,
+            // paths
+            // );
+
+            let mut minimum = usize::MAX;
+            for path in &paths {
+                let path = String::from("A") + &path + "A";
+                // println!("current path: {:?}", path);
+                let c = DirKey::cal_key(&path, 2);
+                minimum = std::cmp::min(minimum, c);
+            }
+            // println!("minimum cost: {}", minimum);
+            cost += minimum;
         }
+        cost
     }
 }
 
@@ -125,24 +142,43 @@ impl DirKey {
         }
     }
 
-    fn cal_key(code: &str) {
+    fn cal_key(code: &str, step: usize) -> usize {
+        if step == 0 {
+            return code.len() - 1;
+        }
+
         let code = code.as_bytes();
 
+        let mut cost = 0;
         for i in 0..code.len() - 1 {
-            println!("{} {}", code[i] as char, code[i + 1] as char);
             let paths =
                 Self::gen_key_path(code[i] as char, code[i + 1] as char);
-            println!("{:?}", paths);
+            // println!("----");
+
+            let mut minimum = usize::MAX;
+            // println!("{:?}", paths);
+            for path in &paths {
+                let path = String::from("A") + &path + "A";
+                let c = DirKey::cal_key(&path, step - 1);
+                minimum = std::cmp::min(minimum, c);
+            }
+            cost += minimum;
         }
+        cost
     }
 }
 
 fn main() {
     let codes = input();
 
+    let mut total_complexity = 0;
     for code in &codes {
         println!("----------------");
-        let code = String::from("A") + &codes[0];
-        NumKey::cal_key(&code);
+        let numeric_part: usize = code[..code.len() - 1].parse().unwrap();
+        let code = String::from("A") + code;
+        let cost = NumKey::cal_key(&code);
+        println!("cost: {}, numeric part: {}", cost, numeric_part);
+        total_complexity += cost * numeric_part;
     }
+    println!("complexity: {}", total_complexity);
 }
