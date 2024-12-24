@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::env;
 use std::fs::read_to_string;
 
@@ -65,7 +66,7 @@ impl NumKey {
         }
     }
 
-    fn cal_key(code: &str) -> usize {
+    fn cal_key(dirkey: &mut DirKey, code: &str) -> usize {
         let code = code.as_bytes();
 
         let mut cost = 0;
@@ -84,7 +85,7 @@ impl NumKey {
             for path in &paths {
                 let path = String::from("A") + path + "A";
                 // println!("current path: {:?}", path);
-                let c = DirKey::cal_key(&path, 25);
+                let c = dirkey.cal_key(&path, 25);
                 minimum = std::cmp::min(minimum, c);
             }
             // println!("minimum cost: {}", minimum);
@@ -94,9 +95,13 @@ impl NumKey {
     }
 }
 
-struct DirKey;
+struct DirKey(HashMap<(char, char, usize), usize>);
 
 impl DirKey {
+    fn new() -> Self {
+        DirKey(HashMap::new())
+    }
+
     fn find_key_pos(ch: char) -> Option<(i32, i32)> {
         let dirkey = [vec![' ', '^', 'A'], vec!['<', 'v', '>']];
 
@@ -142,43 +147,51 @@ impl DirKey {
         }
     }
 
-    fn cal_key(code: &str, step: usize) -> usize {
+    fn cal_key(&mut self, code: &str, step: usize) -> usize {
         if step == 0 {
             return code.len() - 1;
         }
 
         let code = code.as_bytes();
 
-        let mut cost = 0;
+        let mut total_cost = 0;
         for i in 0..code.len() - 1 {
-            let paths =
-                Self::gen_key_path(code[i] as char, code[i + 1] as char);
-            // println!("----");
+            let from = code[i] as char;
+            let to = code[i + 1] as char;
 
-            let mut minimum = usize::MAX;
-            // println!("{:?}", paths);
-            for path in &paths {
-                let path = String::from("A") + path + "A";
-                let c = DirKey::cal_key(&path, step - 1);
-                minimum = std::cmp::min(minimum, c);
+            if let Some(cost) = self.0.get(&(from, to, step)) {
+                total_cost += cost;
+            } else {
+                let paths = Self::gen_key_path(from, to);
+
+                let mut minimum = usize::MAX;
+                for path in &paths {
+                    let path = String::from("A") + path + "A";
+                    let c = self.cal_key(&path, step - 1);
+                    minimum = std::cmp::min(minimum, c);
+                }
+                self.0.insert((from, to, step), minimum);
+                total_cost += minimum;
             }
-            cost += minimum;
         }
-        cost
+        total_cost
     }
 }
 
 fn main() {
     let codes = input();
+    let mut dirkey = DirKey::new();
 
     let mut total_complexity = 0;
     for code in &codes {
         println!("----------------");
         let numeric_part: usize = code[..code.len() - 1].parse().unwrap();
         let code = String::from("A") + code;
-        let cost = NumKey::cal_key(&code);
+        let cost = NumKey::cal_key(&mut dirkey, &code);
         println!("cost: {}, numeric part: {}", cost, numeric_part);
         total_complexity += cost * numeric_part;
     }
-    println!("complexity: {}", total_complexity);
+
+    println!("----------------");
+    println!("total complexity: {}", total_complexity);
 }
