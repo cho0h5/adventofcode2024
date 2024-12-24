@@ -66,7 +66,6 @@ impl NumKey {
     }
 
     fn cal_key(code: &str) {
-        let code = String::from("A") + code;
         let code = code.as_bytes();
 
         for i in 0..code.len() - 1 {
@@ -127,7 +126,6 @@ impl DirKey {
     }
 
     fn cal_key(code: &str) {
-        let code = String::from("A") + code;
         let code = code.as_bytes();
 
         for i in 0..code.len() - 1 {
@@ -142,11 +140,9 @@ impl DirKey {
 fn main() {
     let codes = input();
 
-    println!("codes: {:?}", codes);
-    NumKey::cal_key(&codes[0]);
-
-    println!("----------------");
-
-    let path = DirKey::gen_key_path('A', '<');
-    println!("{:?}", path);
+    for code in &codes {
+        println!("----------------");
+        let code = String::from("A") + &codes[0];
+        NumKey::cal_key(&code);
+    }
 }
