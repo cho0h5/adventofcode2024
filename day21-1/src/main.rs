@@ -82,7 +82,7 @@ impl NumKey {
 
             let mut minimum = usize::MAX;
             for path in &paths {
-                let path = String::from("A") + &path + "A";
+                let path = String::from("A") + path + "A";
                 // println!("current path: {:?}", path);
                 let c = DirKey::cal_key(&path, 2);
                 minimum = std::cmp::min(minimum, c);
@@ -158,7 +158,7 @@ impl DirKey {
             let mut minimum = usize::MAX;
             // println!("{:?}", paths);
             for path in &paths {
-                let path = String::from("A") + &path + "A";
+                let path = String::from("A") + path + "A";
                 let c = DirKey::cal_key(&path, step - 1);
                 minimum = std::cmp::min(minimum, c);
             }
