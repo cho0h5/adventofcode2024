@@ -74,6 +74,17 @@ fn analysis(
     wires[target]
 }
 
+fn print_wire(gates: &Gate, target: &str, step: usize) {
+    if let Some(gate) = gates.get(target) {
+        print!("{}", "  ".repeat(step));
+        println!("{}: {:?}", target, gate);
+        let in1 = &gate.0;
+        let in2 = &gate.2;
+        print_wire(gates, in1, step + 1);
+        print_wire(gates, in2, step + 1);
+    }
+}
+
 fn main() {
     let (mut wires, gates) = input();
     // println!("wires: {:?}", wires);
@@ -89,4 +100,7 @@ fn main() {
     println!("y:\t{0},\t0b{0:048b}", y);
     let z = get_num(&wires, "z");
     println!("z:\t{0},\t0b{0:048b}", z);
+    println!("----------------");
+
+    print_wire(&gates, "z00", 0);
 }
