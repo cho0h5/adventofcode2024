@@ -102,5 +102,13 @@ fn main() {
     println!("z:\t{0},\t0b{0:048b}", z);
     println!("----------------");
 
-    print_wire(&gates, "z00", 0);
+    for i in 0..=45 {
+        print_wire(&gates, &format!("z{:02}", i), 0);
+        println!("----------------");
+    }
+
+    let mut answer =
+        vec!["gst", "z33", "z12", "vdc", "nhn", "z21", "khg", "tvb"];
+    answer.sort();
+    println!("answer: {}", answer.join(","));
 }

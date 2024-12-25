@@ -24,3 +24,5 @@ input*
 *.swp
 .DS_Store
 temp*
+try
+catch
