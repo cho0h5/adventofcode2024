@@ -84,9 +84,9 @@ fn main() {
     }
 
     let x = get_num(&wires, "x");
-    println!("x: {}", x);
+    println!("x:\t{0},\t0b{0:048b}", x);
     let y = get_num(&wires, "y");
-    println!("y: {}", y);
+    println!("y:\t{0},\t0b{0:048b}", y);
     let z = get_num(&wires, "z");
-    println!("z: {}", z);
+    println!("z:\t{0},\t0b{0:048b}", z);
 }
